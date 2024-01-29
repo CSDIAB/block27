@@ -24,6 +24,26 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 //const {useState, useEffect} = React;
 
+
+const Guests = ({guests}) => {
+    console.log(guests);
+    return (
+            <ul>
+               {
+                guests.map(guest => {
+                    return (
+                        <li key = {guest.id}>
+                            {guest.name} 
+                        </li>
+                    )
+                })
+               }
+            </ul>
+    
+    )
+}
+
+
 function App() {
 
     const BASE_URL = 'https://fsa-crud-2aa9294fe819.herokuapp.com/api/2309_ftb_et_web_am/guests';
@@ -40,6 +60,7 @@ function App() {
     return (
         <div>
             <h1>ACME Guest List { guests.length } </h1> 
+            <Guests guests = {guests} /> 
         </div>
            
     )
