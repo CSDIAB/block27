@@ -1,0 +1,13 @@
+body {
+    font-family: 'Times New Roman', Times, serif;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid 1px red;
+}
+
+form > * {
+    margin: .75rem;
+}

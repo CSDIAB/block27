@@ -25,7 +25,7 @@ import { createRoot } from 'react-dom/client';
 //const {useState, useEffect} = React;
 
 
-const Guests = ({guests}) => {
+const Guests = ({guests, destroyGuest}) => {
     console.log(guests);
     return (
             <ul>
@@ -34,6 +34,7 @@ const Guests = ({guests}) => {
                     return (
                         <li key = {guest.id}>
                             {guest.name} 
+                            <button onClick={()=> destroyGuest(guest)}>x</button>
                         </li>
                     )
                 })
@@ -44,10 +45,69 @@ const Guests = ({guests}) => {
 }
 
 
+
+const CreateNewGuest = ({createNewGuest})=> {
+    //console.log(createNewGuest)
+    const [name, setName] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const [phone, setPhone] = React.useState('');
+    const submit = (ev) => {
+        ev.preventDefault();
+        createNewGuest({name, email, phone});
+    };
+    return (
+        <form onSubmit = {submit}>
+            <input
+            placeholder = "Name" 
+            value = { name } 
+            onChange = { function(ev){ setName(ev.target.value)} }
+            />
+            <input
+            placeholder = "email" 
+            value = { email } 
+            onChange = { function(ev){ setEmail(ev.target.value)} }
+            />
+            <input
+            placeholder = "phone" 
+            value = { phone } 
+            onChange = { function(ev){ setPhone(ev.target.value)} }
+            />
+            <button>Submit</button>
+        </form>
+    );
+};
+// I do not quite understand the onchange line. Also do not quite understand the ev parameter in the function.
+
 function App() {
 
     const BASE_URL = 'https://fsa-crud-2aa9294fe819.herokuapp.com/api/2309_ftb_et_web_am/guests';
     const [guests, setGuests] = React.useState([]);
+    const destroyGuest = async(guest) => {
+        await fetch(`${BASE_URL}/${guest.id}`, {
+            method: 'DELETE'
+        });
+        const id = guest.id;
+        const filtered = guests.filter((guest)=> {
+            return guest.id !== id;
+        });
+        setGuests(filtered);
+    };
+    const createNewGuest = async (guest) => {
+        const response = await fetch (
+            BASE_URL,   
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(guest)
+            }
+        );
+        const json = await response.json();
+        //console.log(json.data);
+        setGuests([...guests, json.data]);  
+    };
+
     React.useEffect (() => {
         const fetchData = async () => {
             const response = await fetch(BASE_URL);
@@ -60,7 +120,8 @@ function App() {
     return (
         <div>
             <h1>ACME Guest List { guests.length } </h1> 
-            <Guests guests = {guests} /> 
+            <CreateNewGuest createNewGuest = { createNewGuest } />
+            <Guests guests = {guests} destroyGuest = { destroyGuest } /> 
         </div>
            
     )
